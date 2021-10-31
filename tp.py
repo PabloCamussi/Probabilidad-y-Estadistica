@@ -1,10 +1,15 @@
 import random
 import math
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
-def distribucion_bernoulli(p, n=1, x=random.randint(0, 1)):
+# PARTE 1 -------------------------------
+
+def distribucion_bernoulli(p, n=1, x=random.randint(0, 1)): #1.1
     return p**x*(1-p)**(n-x)
 
-def distribucion_binomial(p, n):
+def distribucion_binomial(p, n): #1-2
     return numero_combinatorio(n, 1) * distribucion_bernoulli(n, p, 1)
 
 def factorial(n):
@@ -16,23 +21,58 @@ def factorial(n):
 def numero_combinatorio(n, x):
     return factorial(n)/factorial(x)*factorial(n - x)
 
-def distribucion_exponencial(λ):
-    U = random.uniform(0, 1)
-    return (-1/λ) * (math.log(U))
+def distribucion_exponencial(gamma): #1.3
+    u = random.uniform(0, 1)
+    return (-1/gamma) * (math.log(u))
 
-def distribucion_normal(μ, σ, x):
-    #resultado = (1/math.sqrt(2*math.pi*σ**2)) * (2.71828**(-1*((x-μ)**2)/(2*σ**2)))
-    resultado = (math.pi*σ) * math.exp(-0.5*((x-μ)/σ)**2)
-    print(resultado)
-    # Z = random.uniform(0, 1)
-    # resultados = [Z * σ + μ for i in range(size)]
-    # print
+def distribucion_normal(size): #1.4
+    #Método Box-Muller
+    #np.random.seed(521) #Numeros random predecibles (siempre son los mismos)
 
-def distribucion_normal2(μ, σ, size=1):
-    for i in range(size):
-        Z = random.uniform(0, 1)
-        resultado = Z * σ + μ
-        if resultado < 5:
-            print(resultado)
+    u1 = np.random.uniform(size = 1000)
+    u2 = np.random.uniform(size = 1000)
+    R = np.sqrt(-2 * np.log(u1))
+    print(R)
+    Theta = 2 * np.pi * u2
+    x = R * np.cos(Theta)
+    y = R * np.sin(Theta)
 
-distribucion_normal(1, 2, 5)
+    print(x)
+    print(y)
+    return x, y
+
+# PARTE 2 --------------------------------------
+
+def generar_numeros_exponenciales(): #2.1
+    primerMuestra = []
+    segundaMuestra = []
+    terceraMuestra = []
+
+    for i in range(10):
+        primerMuestra.append(distribucion_exponencial(0.5))
+    for i in range(30):
+        segundaMuestra.append(distribucion_exponencial(0.5))
+    for i in range(100):
+        terceraMuestra.append(distribucion_exponencial(0.5))
+
+    media1 = calcular_media(primerMuestra)
+    media2 = calcular_media(segundaMuestra)
+    media3 = calcular_media(terceraMuestra)
+
+    varianza1 = calcular_varianza(primerMuestra)
+    varianza2 = calcular_varianza(segundaMuestra)
+    varianza3 = calcular_varianza(terceraMuestra)
+
+    print("Primer muestra (N=10): Media = " + str(media1) + " " + str(varianza1))
+    print("Segunda muestra (N=30): Media = " + str(media2) + " " + str(varianza2))
+    print("Tercera muestra (N=100): Media = " + str(media3) + " " + str(varianza3))
+
+def calcular_media(lista):
+    return sum(lista)/len(lista)
+
+def calcular_varianza(lista):
+    media = calcular_media(lista)
+    varianza = sum((x-media)**2 for x in lista)/len(lista)
+    return varianza
+
+generar_numeros_exponenciales()
